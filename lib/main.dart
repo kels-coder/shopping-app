@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/firebase_options.dart';
 import 'package:shopping_app/screens/auth_screen.dart';
 
 final ThemeData shoppingAppTheme = ThemeData(
@@ -53,7 +55,8 @@ final ThemeData shoppingAppTheme = ThemeData(
   ),
 );
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
