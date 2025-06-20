@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_app/screens/home_screen.dart';
+import 'package:shopping_app/screens/auth_screen.dart';
 
 final ThemeData shoppingAppTheme = ThemeData(
   useMaterial3: true,
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shopping App',
       theme: shoppingAppTheme,
-      home: HomeScreen(),
+      home: AuthScreen(),
     );
   }
 }
