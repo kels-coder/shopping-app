@@ -23,6 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 width: 200,
                 child: Image.asset('assets/images/tomato.jpg'),
               ),
+              Text('my name'),
             ],
           ),
         ),
