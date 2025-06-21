@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/screens/terms_and_condition.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -97,8 +98,15 @@ class _AuthScreenState extends State<AuthScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextFormField(
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: 'Email Address',
+                                    labelStyle: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                          0.055, // 🔹 responsive
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                   keyboardType: TextInputType.emailAddress,
                                   autocorrect: false,
@@ -116,8 +124,15 @@ class _AuthScreenState extends State<AuthScreen> {
                                   },
                                 ),
                                 TextFormField(
-                                  decoration: const InputDecoration(
-                                    labelText: 'password',
+                                  decoration: InputDecoration(
+                                    labelText: 'Password',
+                                    labelStyle: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                          0.055, // 🔹 responsive
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                   obscureText: true,
                                   validator: (value) {
@@ -132,10 +147,21 @@ class _AuthScreenState extends State<AuthScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 12),
-                                ElevatedButton(
+                                ElevatedButton.icon(
                                   onPressed: _submit,
-                                  child: Text(_isLogin ? 'Login' : 'Signup'),
+                                  icon: Icon(
+                                    _isLogin ? Icons.login : Icons.person_add,
+                                  ), // 👈 icon changes based on login/signup
+                                  label: Text(_isLogin ? 'Login' : 'Signup'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 10,
+                                    ),
+                                    textStyle: const TextStyle(fontSize: 16),
+                                  ),
                                 ),
+
                                 TextButton(
                                   onPressed: () {
                                     setState(() {
@@ -146,6 +172,26 @@ class _AuthScreenState extends State<AuthScreen> {
                                     _isLogin
                                         ? 'Create an account'
                                         : 'I already have an account',
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (ctx) =>
+                                            TermsAndConditionsScreen(), // 👈 Create this screen
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Read our Terms and Conditions',
+                                    style: TextStyle(
+                                      decoration: TextDecoration.underline,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.secondary,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               ],
