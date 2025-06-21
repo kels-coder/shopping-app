@@ -26,28 +26,33 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
     _formKey.currentState!.save();
-
-    if (_isLogin) {
-      //log users in
-    } else {
-      try {
+    try {
+      if (_isLogin) {
+        final userCredentials = _firebase.signInWithEmailAndPassword(
+          email: _enteredEmail,
+          password: _enteredPassword,
+        );
+        print(userCredentials);
+      } else {
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
         print(userCredentials);
-      } on FirebaseAuthException catch (error) {
-        if (error.code == 'email-already-in-use') {}
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message ?? 'Authentication failed')),
-        );
       }
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'email-already-in-use') {}
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message ?? 'Authentication failed')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Stack(
@@ -60,76 +65,91 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(
-                      top: 30,
-                      bottom: 20,
-                      left: 20,
+                  const SizedBox(height: 40),
+                  Text(
+                    'My Store',
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontSize: screenWidth < 400 ? 26 : 32, // 🔹 Responsive
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 8,
+                          color: Colors.black54,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
                   ),
-                  Card(
-                    margin: EdgeInsets.all(20),
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'Email Address',
+                  const SizedBox(height: 20),
+                  Container(
+                    width: screenWidth * 0.9, // 🔹 Take 90% of screen
+                    constraints: const BoxConstraints(
+                      maxWidth: 400, // 🔹 But never exceed 400px
+                    ),
+                    child: Card(
+                      margin: const EdgeInsets.all(20),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'Email Address',
+                                  ),
+                                  keyboardType: TextInputType.emailAddress,
+                                  autocorrect: false,
+                                  textCapitalization: TextCapitalization.none,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.trim().isEmpty ||
+                                        !value.contains('@')) {
+                                      return 'Please Enter a Valid Email Address';
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _enteredEmail = value!;
+                                  },
                                 ),
-                                keyboardType: TextInputType.emailAddress,
-                                autocorrect: false,
-                                textCapitalization: TextCapitalization.none,
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.trim().isEmpty ||
-                                      !value.contains('@')) {
-                                    return 'Please Enter a Valid Email Address';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _enteredEmail = value!;
-                                },
-                              ),
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'password',
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'password',
+                                  ),
+                                  obscureText: true,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.trim().length < 6) {
+                                      return 'Password must be at least 6 characters long';
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _enteredPassword = value!;
+                                  },
                                 ),
-                                obscureText: true,
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.trim().length < 6) {
-                                    return 'Password must be at least 6 characters long';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _enteredPassword = value!;
-                                },
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: _submit,
-                                child: Text(_isLogin ? 'Login' : 'Signup'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _isLogin = !_isLogin;
-                                  });
-                                },
-                                child: Text(
-                                  _isLogin
-                                      ? 'Create an account'
-                                      : 'I already have an account',
+                                const SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: _submit,
+                                  child: Text(_isLogin ? 'Login' : 'Signup'),
                                 ),
-                              ),
-                            ],
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isLogin = !_isLogin;
+                                    });
+                                  },
+                                  child: Text(
+                                    _isLogin
+                                        ? 'Create an account'
+                                        : 'I already have an account',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
