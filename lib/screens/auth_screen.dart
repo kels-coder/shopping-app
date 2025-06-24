@@ -103,7 +103,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     labelStyle: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.width *
-                                          0.055, // 🔹 responsive
+                                          0.045, // 🔹 responsive
                                       fontWeight: FontWeight.w500,
                                       color: Colors.black87,
                                     ),
@@ -129,7 +129,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     labelStyle: TextStyle(
                                       fontSize:
                                           MediaQuery.of(context).size.width *
-                                          0.055, // 🔹 responsive
+                                          0.045, // 🔹 responsive
                                       fontWeight: FontWeight.w500,
                                       color: Colors.black87,
                                     ),

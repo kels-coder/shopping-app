@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shopping_app/firebase_options.dart';
 import 'package:shopping_app/screens/auth_screen.dart';
+import 'package:shopping_app/screens/home_screen.dart';
+import 'package:shopping_app/screens/splash_screen.dart';
 
 final ThemeData shoppingAppTheme = ThemeData(
   useMaterial3: true,
@@ -70,7 +73,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shopping App',
       theme: shoppingAppTheme,
-      home: AuthScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctz, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SplashScreen();
+          }
+          if (snapshot.hasData) {
+            return HomeScreen();
+          }
+          return AuthScreen();
+        },
+      ),
     );
   }
 }
