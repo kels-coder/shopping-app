@@ -6,20 +6,12 @@ class HomeScreen extends StatelessWidget {
 
   final _firebase = FirebaseAuth.instance;
 
-  void _logout() {
-    _firebase.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // ✅ Let body go behind AppBar
       appBar: AppBar(
-        backgroundColor: Colors.blue.withOpacity(
-          0.95,
-        ), // ✅ slightly transparent
-        elevation: 0,
         centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: const Text('Shopping App'),
         titleTextStyle: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -29,13 +21,15 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: _logout,
+            onPressed: () {
+              _firebase.signOut();
+            },
             child: const Text(
               'Logout',
               style: TextStyle(
-                decoration: TextDecoration.underline,
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
+                fontSize: 20,
               ),
             ),
           ),
