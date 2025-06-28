@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shopping_app/screens/terms_and_condition.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -21,10 +22,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
-    FocusScope.of(context).unfocus(); // hide keyboard
+    FocusScope.of(context).unfocus();
 
     if (!isValid) return;
-
     _formKey.currentState!.save();
 
     setState(() {
@@ -53,13 +53,11 @@ class _AuthScreenState extends State<AuthScreen> {
       } else if (error.code == 'wrong-password') {
         message = 'Incorrect password.';
       }
-      if (!mounted) return;
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(SnackBar(content: Text(message)));
-
-      if (!mounted) return;
 
       setState(() {
         _isAuthenticating = false;
@@ -72,38 +70,48 @@ class _AuthScreenState extends State<AuthScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
       body: Stack(
         children: [
+          // Background image
           Positioned.fill(
             child: Image.asset('assets/images/tomato.jpg', fit: BoxFit.cover),
           ),
+          // Dark overlay
+          Positioned.fill(child: Container(color: Colors.black.withAlpha(102))),
           Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 40),
-                  Text(
-                    'My Store',
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontSize: screenWidth < 400 ? 26 : 32,
-                      color: Colors.white,
-                      shadows: const [
-                        Shadow(
-                          blurRadius: 8,
-                          color: Colors.black54,
-                          offset: Offset(2, 2),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 40),
+                    // App title
+                    Text(
+                      'Organic Basket',
+                      style: GoogleFonts.pacifico(
+                        textStyle: TextStyle(
+                          fontSize: screenWidth < 400 ? 28 : 36,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(
+                              blurRadius: 8,
+                              color: Colors.black54,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: screenWidth * 0.9,
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Card(
-                      margin: const EdgeInsets.all(20),
+
+                    const SizedBox(height: 20),
+
+                    // Login / Signup Form
+                    Card(
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Form(
@@ -112,15 +120,12 @@ class _AuthScreenState extends State<AuthScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               TextFormField(
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   labelText: 'Email Address',
-                                  labelStyle: TextStyle(
-                                    fontSize: screenWidth * 0.045,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87,
-                                  ),
                                 ),
                                 keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                autofillHints: const [AutofillHints.email],
                                 autocorrect: false,
                                 textCapitalization: TextCapitalization.none,
                                 validator: (value) {
@@ -137,15 +142,12 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                               const SizedBox(height: 12),
                               TextFormField(
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   labelText: 'Password',
-                                  labelStyle: TextStyle(
-                                    fontSize: screenWidth * 0.045,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87,
-                                  ),
                                 ),
                                 obscureText: true,
+                                textInputAction: TextInputAction.done,
+                                autofillHints: const [AutofillHints.password],
                                 validator: (value) {
                                   if (value == null ||
                                       value.trim().length < 6) {
@@ -158,23 +160,30 @@ class _AuthScreenState extends State<AuthScreen> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              if (_isAuthenticating)
-                                const CircularProgressIndicator()
-                              else
-                                ElevatedButton.icon(
-                                  onPressed: _submit,
-                                  icon: Icon(
-                                    _isLogin ? Icons.login : Icons.person_add,
-                                  ),
-                                  label: Text(_isLogin ? 'Login' : 'Signup'),
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                      vertical: 10,
-                                    ),
-                                    textStyle: const TextStyle(fontSize: 16),
-                                  ),
-                                ),
+
+                              // Submit button / loading
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: _isAuthenticating
+                                    ? const CircularProgressIndicator(
+                                        key: ValueKey(1),
+                                      )
+                                    : ElevatedButton.icon(
+                                        key: const ValueKey(2),
+                                        onPressed: _submit,
+                                        icon: Icon(
+                                          _isLogin
+                                              ? Icons.login
+                                              : Icons.person_add,
+                                        ),
+                                        label: Text(
+                                          _isLogin ? 'Login' : 'Signup',
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              // Toggle between login/signup
                               TextButton(
                                 onPressed: () {
                                   setState(() {
@@ -187,7 +196,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                       : 'I already have an account',
                                 ),
                               ),
-                              const SizedBox(height: 8),
+
+                              // Terms and conditions
                               GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(
@@ -203,7 +213,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     decoration: TextDecoration.underline,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.secondary,
+                                    ).colorScheme.secondary.withOpacity(0.9),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -213,8 +223,8 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
