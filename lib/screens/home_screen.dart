@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
-
-  final _firebase = FirebaseAuth.instance;
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userEmail = FirebaseAuth.instance.currentUser!.email ?? 'User';
+    final username = userEmail.split('@')[0];
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -20,18 +22,25 @@ class HomeScreen extends StatelessWidget {
           fontSize: 24,
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              _firebase.signOut();
-            },
-            child: const Text(
-              'Logout',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
+          Row(
+            children: [
+              Text(
+                username,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
+              IconButton(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (ctx) => ProfileScreen()));
+                },
+              ),
+            ],
           ),
         ],
       ),
