@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shopping_app/models/user_profile.dart';
 import 'package:shopping_app/provider/username_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -30,6 +32,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
     Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
+  Future<void> _saveProfileToFirestore(
+    String email,
+    String address,
+    String phone,
+  ) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final profile = UserProfile(
+      email: email,
+      address: address,
+      phoneNumber: phone,
+    );
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .set(profile.toMap());
   }
 
   @override
@@ -127,13 +148,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   Icons.check,
                                   color: Colors.green,
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   final input = _addressController.text.trim();
                                   if (input.isNotEmpty) {
                                     setState(() {
                                       _savedAddress = input;
                                       _isEditingAddress = false;
                                     });
+                                    await _saveProfileToFirestore(
+                                      email,
+                                      _savedAddress,
+                                      _savedPhone,
+                                    );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Address saved'),
@@ -206,13 +232,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   Icons.check,
                                   color: Colors.green,
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   final input = _phoneController.text.trim();
                                   if (input.isNotEmpty) {
                                     setState(() {
                                       _savedPhone = input;
                                       _isEditingPhone = false;
                                     });
+                                    await _saveProfileToFirestore(
+                                      email,
+                                      _savedAddress,
+                                      _savedPhone,
+                                    );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Phone number saved'),
